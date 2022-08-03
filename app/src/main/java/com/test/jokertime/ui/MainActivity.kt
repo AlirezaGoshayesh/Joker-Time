@@ -1,24 +1,31 @@
-package com.test.jokertime
+package com.test.jokertime.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Feed
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.test.jokertime.R
+import com.test.jokertime.data.model.JokeModel
+import com.test.jokertime.domain.base.Resource
 import com.test.jokertime.ui.theme.JokerTimeTheme
+import com.test.jokertime.ui.viewModels.TellMeJokeVM
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,18 +43,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-data class Joke(val category: String, val description: String)
-
 @Composable
-fun JokeBox(modifier: Modifier, joke: Joke) {
+fun JokeBox(modifier: Modifier, jokeCategory: String, jokeText: String) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colors.secondary
     ) {
         Column {
-            CategoryName(name = joke.category)
-            JokeDescription(jokeText = joke.description)
+            CategoryName(name = jokeCategory)
+            JokeDescription(jokeText = jokeText)
         }
     }
 }
@@ -89,9 +94,9 @@ fun JokeDescription(jokeText: String) {
 }
 
 @Composable
-fun GetNewJokeButton() {
+fun GetNewJokeButton(onClicked: () -> Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = onClicked,
         Modifier
             .padding(8.dp)
     ) {
@@ -109,16 +114,37 @@ fun GetNewJokeButton() {
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    tellMeJokeVM: TellMeJokeVM = viewModel()
+) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        JokeBox(
-            joke = Joke(
-                "Program",
-                "Java and C were telling jokes. It was C's turn, so he writes something on the wall, points to it and says \"Do you get the reference?\" But Java didn't."
-            ),
-            modifier = Modifier.padding(all = 8.dp)
-        )
-        GetNewJokeButton()
+        val jokeValue by tellMeJokeVM.joke
+        when (jokeValue) {
+            is Resource.Error -> ErrorBox(
+                text = (jokeValue as Resource.Error).errorModel.getErrorMessage()
+            )
+            is Resource.Loading -> {}
+            is Resource.Success -> JokeBox(
+                jokeCategory = (jokeValue as Resource.Success<JokeModel>).data.category,
+                jokeText = (jokeValue as Resource.Success<JokeModel>).data.joke,
+                modifier = Modifier.padding(all = 8.dp)
+            )
+        }
+        GetNewJokeButton {
+            tellMeJokeVM.tellJoke()
+        }
+    }
+}
+
+@Composable
+fun ErrorBox(text: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colors.error
+    ) {
+        Text(text = text, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
     }
 }
 
@@ -126,7 +152,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 @Composable
 fun GetNewJokeButtonPreview() {
     JokerTimeTheme {
-        GetNewJokeButton()
+        GetNewJokeButton {}
     }
 }
 
@@ -135,11 +161,9 @@ fun GetNewJokeButtonPreview() {
 fun JokeBoxPreview() {
     JokerTimeTheme {
         JokeBox(
-            joke = Joke(
-                "Program",
-                "Java and C were telling jokes. It was C's turn, so he writes something on the wall, points to it and says \"Do you get the reference?\" But Java didn't."
-            ),
-            modifier = Modifier.padding(all = 8.dp)
+            modifier = Modifier.padding(all = 8.dp),
+            jokeCategory = "Program",
+            jokeText = "Java and C were telling jokes. It was C's turn, so he writes something on the wall, points to it and says \"Do you get the reference?\" But Java didn't."
         )
     }
 }
