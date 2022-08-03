@@ -11,6 +11,9 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Feed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -118,13 +121,16 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     tellMeJokeVM: TellMeJokeVM = viewModel()
 ) {
+    var isTelling by rememberSaveable {
+        mutableStateOf(false)
+    }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         val jokeValue by tellMeJokeVM.joke
         when (jokeValue) {
             is Resource.Error -> ErrorBox(
                 text = (jokeValue as Resource.Error).errorModel.getErrorMessage()
             )
-            is Resource.Loading -> {}
+            is Resource.Loading -> if (isTelling) Loading()
             is Resource.Success -> JokeBox(
                 jokeCategory = (jokeValue as Resource.Success<JokeModel>).data.category,
                 jokeText = (jokeValue as Resource.Success<JokeModel>).data.joke,
@@ -132,6 +138,7 @@ fun HomeScreen(
             )
         }
         GetNewJokeButton {
+            isTelling = true
             tellMeJokeVM.tellJoke()
         }
     }
@@ -146,6 +153,11 @@ fun ErrorBox(text: String, modifier: Modifier = Modifier) {
     ) {
         Text(text = text, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
     }
+}
+
+@Composable
+fun Loading(modifier: Modifier = Modifier) {
+    CircularProgressIndicator()
 }
 
 @Preview(showBackground = true)
