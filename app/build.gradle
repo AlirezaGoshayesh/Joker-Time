@@ -65,6 +65,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:3.12.1"
 
+    implementation "com.airbnb.android:lottie-compose:5.2.0"
+
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
     implementation 'androidx.activity:activity-compose:1.5.1'
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
