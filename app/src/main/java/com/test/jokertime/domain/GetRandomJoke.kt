@@ -8,8 +8,8 @@ import javax.inject.Inject
 class GetRandomJoke @Inject constructor(
     private val repository: Repository,
     errorHandler: IErrorHandler
-) : UseCase<Unit, JokeModel>(errorHandler) {
-    override suspend fun execute(parameters: Unit): JokeModel {
-        return repository.getRandomJoke()
+) : UseCase<String, JokeModel>(errorHandler) {
+    override suspend fun execute(parameters: String): JokeModel {
+        return repository.getRandomJoke(parameters)
     }
 }

@@ -5,6 +5,6 @@ import com.test.jokertime.data.model.JokeModel
 
 interface RemoteDataSource {
 
-    suspend fun getRandomJoke(): JokeModel
+    suspend fun getRandomJoke(category: String): JokeModel
 
 }

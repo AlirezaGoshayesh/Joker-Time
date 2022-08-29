@@ -4,6 +4,6 @@ import com.test.jokertime.data.model.JokeModel
 
 interface Repository {
 
-    suspend fun getRandomJoke(): JokeModel
+    suspend fun getRandomJoke(category: String): JokeModel
 
 }
