@@ -18,9 +18,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.test.jokertime.R
 import com.test.jokertime.data.model.JokeModel
@@ -47,6 +53,8 @@ fun JokeScreen(
             navController.navigateUp()
         })
         val jokeValue by tellMeJokeVM.joke
+        if (!isTelling)
+            HelpView()
         when (jokeValue) {
             is Resource.Error -> ErrorBox(
                 text = (jokeValue as Resource.Error).errorModel.getErrorMessage()
@@ -63,6 +71,38 @@ fun JokeScreen(
             tellMeJokeVM.tellJoke(category)
         }
     }
+}
+
+@Composable
+fun HelpView(modifier: Modifier = Modifier) {
+    Text(modifier = modifier, text = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colors.primary,
+                fontSize = 14.sp
+            )
+        ) {
+            append("Click")
+        }
+        withStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colors.secondary,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                fontStyle = FontStyle.Italic
+            )
+        ) {
+            append(" Tell Me Joker! ")
+        }
+        withStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colors.primary,
+                fontSize = 14.sp
+            )
+        ) {
+            append(" button to get new joke!")
+        }
+    })
 }
 
 @Composable

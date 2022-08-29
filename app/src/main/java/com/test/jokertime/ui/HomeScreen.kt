@@ -129,7 +129,7 @@ fun TopHeader(modifier: Modifier = Modifier) {
                 .offset(x = 60.dp, y = (-60).dp)
         ) {
             Text(
-                text = "will tell you jokes",
+                text = "tells you jokes",
                 color = color,
                 fontSize = 14.sp
             )
