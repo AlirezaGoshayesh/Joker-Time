@@ -8,21 +8,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.Feed
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.SentimentVerySatisfied
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -39,13 +39,19 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.test.jokertime.R
 import com.test.jokertime.ui.theme.JokerTimeTheme
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun HomeScreen(
+    scaffoldState: ScaffoldState,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    var selectedCategories: List<String> by rememberSaveable() {
+        mutableStateOf(listOf("Programming"))
+    }
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -54,9 +60,29 @@ fun HomeScreen(
         TopHeader()
         JokerAnimation(modifier = Modifier.weight(1f))
         CategoriesSection(
-            list = listOf("Misc", "Programming", "Dark", "Spooky"),
-            onClicked = { category ->
-                navController.navigate(Screen.JokeScreen.withArgs(category))
+            categories = listOf("Programming", "Misc", "Dark", "Pun"),
+            selectedCategories = selectedCategories,
+            onSelectionChanged = { category ->
+                val list = selectedCategories.toMutableList()
+                if (list.contains(category))
+                    list.remove(category)
+                else
+                    list.add(category)
+                selectedCategories = list
+            },
+            onDoneClicked = {
+                if (selectedCategories.isEmpty())
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = "Choose at least one category!"
+                        )
+                    }
+                else
+                    navController.navigate(
+                        Screen.JokeScreen.withArgs(
+                            selectedCategories.joinToString(",")
+                        )
+                    )
             }
         )
     }
@@ -145,15 +171,36 @@ fun TopHeader(modifier: Modifier = Modifier) {
 
 @Composable
 fun CategoriesSection(
-    list: List<String>,
-    modifier: Modifier = Modifier,
-    onClicked: (String) -> Unit
+    categories: List<String>,
+    selectedCategories: List<String>,
+    onSelectionChanged: (String) -> Unit,
+    onDoneClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Choose one category!", color = MaterialTheme.colors.primary, fontSize = 18.sp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "Choose categories and click",
+                color = MaterialTheme.colors.primary,
+                fontSize = 18.sp
+            )
+            Icon(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(color = MaterialTheme.colors.primary, shape = CircleShape)
+                    .padding(4.dp)
+                    .clickable { onDoneClicked() },
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "next",
+                tint = MaterialTheme.colors.onPrimary
+            )
+        }
         Spacer(modifier = modifier.height(8.dp))
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -163,22 +210,36 @@ fun CategoriesSection(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
-            items(list) { item ->
-                CategoryButton(text = item, onClicked = onClicked)
+            items(categories) { item ->
+                CategoryChip(
+                    text = item,
+                    isSelected = selectedCategories.contains(item),
+                    onClicked = onSelectionChanged
+                )
             }
         }
     }
 }
 
 @Composable
-fun CategoryButton(text: String, modifier: Modifier = Modifier, onClicked: (String) -> Unit) {
+fun CategoryChip(
+    text: String,
+    isSelected: Boolean = false,
+    onClicked: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .heightIn(min = 40.dp)
             .clip(RoundedCornerShape(8.dp))
             .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
-            .clickable { onClicked(text) },
+            .background(if (isSelected) MaterialTheme.colors.primary else Color.LightGray)
+            .toggleable(
+                value = isSelected,
+                onValueChange = {
+                    onClicked(text)
+                }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(

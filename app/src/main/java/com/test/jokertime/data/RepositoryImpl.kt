@@ -8,7 +8,7 @@ import javax.inject.Inject
 class RepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource
 ) : Repository {
-    override suspend fun getRandomJoke(category: String): JokeModel =
-        remoteDataSource.getRandomJoke(category)
+    override suspend fun getRandomJoke(categories: String): JokeModel =
+        remoteDataSource.getRandomJoke(categories)
 
 }

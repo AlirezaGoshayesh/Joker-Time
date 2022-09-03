@@ -1,5 +1,6 @@
 package com.test.jokertime.ui
 
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -10,16 +11,16 @@ import androidx.navigation.navArgument
 import com.test.jokertime.ui.viewModels.TellMeJokeVM
 
 @Composable
-fun Navigation() {
+fun Navigation(scaffoldState: ScaffoldState) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
         composable(route = Screen.HomeScreen.route) {
-            HomeScreen(navController = navController)
+            HomeScreen(scaffoldState = scaffoldState, navController = navController)
         }
         composable(
-            route = Screen.JokeScreen.route + "/{category}",
+            route = Screen.JokeScreen.route + "/{categories}",
             arguments = listOf(
-                navArgument("category") {
+                navArgument("categories") {
                     type = NavType.StringType
                     nullable = false
                 }
@@ -27,7 +28,7 @@ fun Navigation() {
         ) { entry ->
             JokeScreen(
                 navController = navController,
-                category = entry.arguments?.getString("category").toString(),
+                categories = entry.arguments?.getString("categories").toString(),
                 tellMeJokeVM = hiltViewModel()
             )
         }

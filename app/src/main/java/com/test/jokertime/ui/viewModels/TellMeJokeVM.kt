@@ -22,9 +22,9 @@ class TellMeJokeVM @Inject constructor(
     /**
      * Called to get random joke
      */
-    fun tellJoke(category: String) {
+    fun tellJoke(categories: String) {
         viewModelScope.launch {
-            _jokeModel.value = getRandomJoke(category)
+            _jokeModel.value = getRandomJoke(categories)
         }
 
     }

@@ -6,6 +6,6 @@ import javax.inject.Inject
 
 class RemoteDataSourceImpl @Inject constructor(private val service: MService) :
     RemoteDataSource {
-    override suspend fun getRandomJoke(category: String): JokeModel = service.getRandomJoke(category)
+    override suspend fun getRandomJoke(categories: String): JokeModel = service.getRandomJoke(categories)
 
 }

@@ -10,9 +10,9 @@ interface MService {
     /**
      * get random programming joke.
      */
-    @GET("joke/{category}")
+    @GET("joke/{categories}")
     suspend fun getRandomJoke(
-        @Path("category") category: String,
+        @Path("categories") categories: String,
         @Query("type") type: String = "single"
     ): JokeModel
 
