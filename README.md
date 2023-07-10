@@ -1,8 +1,7 @@
 # Joker Time
 
 A short-time project that uses the most recent technologies, libraries and best practices(Compose UI as main feature).
-
-![icon](app/src/main/res/mipmap-mdpi/ic_launcher.png)
+<img src="app/src/main/res/mipmap-hdpi/ic_launcher.png" alt="drawing" width="240"/>
 ![sample](gif.gif)
 
 Technologies and libraries:
