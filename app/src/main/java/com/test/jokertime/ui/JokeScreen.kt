@@ -209,7 +209,7 @@ fun ErrorBox(text: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun Loading(modifier: Modifier = Modifier) {
-    CircularProgressIndicator()
+    CircularProgressIndicator(modifier = modifier)
 }
 
 @Preview(showBackground = true)
