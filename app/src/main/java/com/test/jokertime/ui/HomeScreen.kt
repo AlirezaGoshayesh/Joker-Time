@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -195,6 +196,7 @@ fun CategoriesSection(
                     .size(32.dp)
                     .background(color = MaterialTheme.colors.primary, shape = CircleShape)
                     .padding(4.dp)
+                    .testTag("Done")
                     .clickable { onDoneClicked() },
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "next",
